@@ -14,7 +14,7 @@ def accuracy(y_true,y_pred, mode='SVM'):
     return np.sum(y_true == predictions) / n
 
 
-def MSE(K, y, lambd, alpha):
+def MSE(K, y, lambd, alpha, valid=False):
     """
     Computes the penalized Mean Squared Error
     K : (n_samples * n)
@@ -24,8 +24,9 @@ def MSE(K, y, lambd, alpha):
     """
     n = y.shape[0]
     data_term = (np.linalg.norm(np.dot(K, alpha.reshape(-1,1)) - y)**2)/n
-    reg_term = alpha @ K @ alpha
-    return(data_term + lambd * reg_term)
+    if not valid:
+        data_term += alpha @ K @ alpha
+    return(data_term)
 
 def KRR(K, y, Kval, yval, lambd):
     """
@@ -52,7 +53,7 @@ def KRR(K, y, Kval, yval, lambd):
         loss_lambda = MSE(K, y, l, alpha)
         acc_lambda = accuracy(y,K@alpha, mode="KRR")
         
-        loss_lambdaval = MSE(Kval, yval, l, alpha)
+        loss_lambdaval = MSE(Kval, yval, l, alpha, valid=True)
         acc_lambdaval = accuracy(yval,Kval@alpha, mode="KRR")
 
         print(f"***********lambda = {l}***********")
@@ -83,13 +84,13 @@ def KLR(K, y, Kval, yval, lambd, maxIter = 100, tresh = 1e-8):
     # initialize the values
     assert K.shape[0] == y.shape[0]
     n = K.shape[0]
+    n_val = Kval.shape[0]
     
     y_ = np.ones(n)
-    yval_ = np.ones(n)
+    yval_ = np.ones(n_val)
     
     y_[y == 0] = -1
     yval_[yval == 0] = -1
-    
     
     loss = []
     acc = []
@@ -165,14 +166,14 @@ def hinge_loss(y_true, y_pred):
     return(np.sum(term)/n)
 
 def SVM(K, y, K_val, y_val, lambd):
-    """
-    
-    """
+    # takes y with values in 0, 1 which need to be turnt into -1,1
+    # initialize the values
     assert K.shape[0] == y.shape[0]
     n = K.shape[0]
+    n_val = K_val.shape[0]
     
     y_ = np.ones(n)
-    yval_ = np.ones(n)
+    yval_ = np.ones(n_val)
     
     y_[y == 0] = -1
     yval_[y_val == 0] = -1
@@ -224,6 +225,12 @@ def SVM(K, y, K_val, y_val, lambd):
         alphas +=[alpha] 
         
     return(alphas, losses, accuracies, losses_val, accuracies_val)
+
+def solveWKRR(K, W_t, z_t, y_, l):
+    n = K.shape[0]
+    W_sq = np.sqrt(W_t)
+    sol = np.linalg.solve(W_sq @ K @ W_sq + n* l * np.eye(n), W_sq@y_)
+    return(W_sq @ sol)
             
 
 
