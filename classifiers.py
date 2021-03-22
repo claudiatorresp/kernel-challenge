@@ -191,7 +191,7 @@ def SVM(K, y, K_val, y_val, lambd):
         q = matrix(-y_)
         D = np.diag(-y_)
         G = matrix(np.vstack((D,-D)))
-        h = matrix(np.concatenate((np.zeros(n), 1/(2*l*n) * np.ones(n)), axis=0))
+        h = matrix(np.concatenate((np.zeros(n), l * np.ones(n)), axis=0))
         solvers.options['show_progress'] = False
         sol=solvers.qp(P, q, G, h)
         alpha = sol['x']
