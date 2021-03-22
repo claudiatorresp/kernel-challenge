@@ -8,7 +8,8 @@ def write_predictions_csv(test_kernels, test_alphas, path, mode="SVM"):
     
     for i in range(3):
         y_pred = test_kernels[i] @ test_alphas[i]
-        if mode == 'y_pred':
+        if mode == 'SVM':
+            print("Entered mode SVM")
             y_pred_ = np.ones(n)
             y_pred_[y_pred < 0] = 0
         else:
