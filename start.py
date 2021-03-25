@@ -147,7 +147,7 @@ y_te2_pred_mv = no_weighted_mv(Kernels_tr_2[1:],
             K_test =Kernels_te_2[1:])
 print("")
 
-write_predictions_csv([y_te0_pred_mv, y_te1_pred_mv, y_te2_pred_mv], "predictions/y_tes_mv.csv", mode="SVM")
+write_predictions_csv([y_te0_pred_mv, y_te1_pred_mv, y_te2_pred_mv], "predictions/y_test_mv.csv", mode="SVM")
 
 
 print("Ready to predict - Weighted Majority Voting")
@@ -170,5 +170,5 @@ y_te2_pred_wmv = weighted_mv(Kernels_tr_2[1:],
             alphas_2[1:], ytr2[:,1], yval2[:,1],
             K_test =Kernels_te_2[1:])
 print("")
-write_predictions_csv([y_te0_pred_wmv, y_te1_pred_wmv, y_te2_pred_wmv], "predictions/y_tes_wmv.csv", mode="SVM")
+write_predictions_csv([y_te0_pred_wmv, y_te1_pred_wmv, y_te2_pred_wmv], "predictions/y_test_wmv.csv", mode="SVM")
 
