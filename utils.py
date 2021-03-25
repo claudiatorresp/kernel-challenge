@@ -1,21 +1,21 @@
+from csv import reader
 import numpy as np
 import pandas as pd
 
-def accuracy(y_true,y_pred, mode='SVM'):
-    """
-    Computes the accuracy of the predictions given the ground-truth
-    """
-    
-    n = y_true.shape[0]
-    if mode == 'SVM':
-        predictions = np.ones(n)
-        predictions[y_pred < 0] = 0
-    else:
-        predictions = np.zeros(n)
-        predictions[y_pred >= 0.5] = 1
-    
-    return np.mean(y_true == predictions)
 
+def features_into_array(path):
+    with open(path, 'r') as read_obj:
+        csv_reader = reader(read_obj)
+        header = next(csv_reader)
+        X = list()
+        if header != None:
+            for row in csv_reader:
+                # row variable is a list that represents a row in csv
+                X.append(np.array(row[1]))
+                
+    X = np.array(X) ## dtype might be changed in something more convenient. For now, dtype = "<U1"
+    return X
+    
 def write_predictions_csv(y_tests, path, mode="SVM"):
     """
     Takes as inputs a list of the predictions [K0@alpha0, K1@akpha1, K2@alpha2] and saves them to the given path
@@ -41,4 +41,4 @@ def write_predictions_csv(y_tests, path, mode="SVM"):
     print("saving predictions to " + path)
     pred.to_csv(path, index=True,index_label="Id")
     print("saved predictions")
-
+    return(predictions)

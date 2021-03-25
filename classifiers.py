@@ -1,18 +1,6 @@
 import numpy as np
 from cvxopt import matrix, solvers
-
-
-def accuracy(y_true,y_pred, mode='SVM'):
-    n = y_true.shape[0]
-    if mode == 'SVM':
-        predictions = np.ones(n)
-        predictions[y_pred < 0] = 0
-    else:
-        predictions = np.zeros(n)
-        predictions[y_pred >= 0.5] = 1
-    
-    return np.sum(y_true == predictions) / n
-
+from metrics import accuracy
 
 def MSE(K, y, lambd, alpha, valid=False):
     """
@@ -36,11 +24,6 @@ def KRR(K, y, Kval, yval, lambd):
     assert len(lambd) > 0
     n = K.shape[0]
     
-    loss = []
-    acc = []
-    
-    loss_val = []
-    acc_val = []
     alphas = []
     
     for l in lambd:
@@ -60,16 +43,9 @@ def KRR(K, y, Kval, yval, lambd):
         print(f"Training: loss = {loss_lambda:.4f}, accuracy = {acc_lambda:.6f}")
         print(f"Validation: loss = {loss_lambdaval:.4f}, accuracy = {acc_lambdaval:.6f}")
         
-        loss += [loss_lambda]
-        acc += [acc_lambda]
-        
-        loss_val += [loss_lambdaval]
-        acc_val += [acc_lambdaval]
-        
-        
         alphas +=[alpha]
         
-    return(alphas, loss, acc, loss_val, acc_val)
+    return(alphas)
 
 def sigmoid(x):
     return 1/(1+np.exp(-x))
@@ -91,13 +67,6 @@ def KLR(K, y, Kval, yval, lambd, maxIter = 100, tresh = 1e-8):
     
     y_[y == 0] = -1
     yval_[yval == 0] = -1
-    
-    loss = []
-    acc = []
-    
-    loss_val = []
-    acc_val = []
-    
     
     alphas = []
     
@@ -149,16 +118,9 @@ def KLR(K, y, Kval, yval, lambd, maxIter = 100, tresh = 1e-8):
         print(f"Training: loss = {loss_lambda:.4f}, accuracy = {acc_lambda:.6f}")
         print(f"Validation: loss = {loss_lambdaval:.4f}, accuracy = {acc_lambdaval:.6f}")
         
-        
-        loss += [loss_lambda]
-        acc += [acc_lambda]
-        
-        loss_val += [loss_lambdaval]
-        acc_val += [acc_lambdaval]
-        
         alphas +=[alpha_t]
         
-    return(alphas, loss, acc, loss_val, acc_val)
+    return(alphas)
 
 def hinge_loss(y_true, y_pred):
     n = y_true.shape[0]
@@ -178,9 +140,6 @@ def SVM(K, y, K_val, y_val, lambd):
     y_[y == 0] = -1
     yval_[y_val == 0] = -1
     
-    y_preds, y_preds_val = [], []
-    losses, losses_val = [], []
-    accuracies, accuracies_val = [], []
     alphas = []
     
     
@@ -200,14 +159,12 @@ def SVM(K, y, K_val, y_val, lambd):
         ## predictions
         # training
         pred_l = K @ alpha
-        y_preds += [pred_l]
         loss_l = hinge_loss(y_, pred_l)
         acc_l = accuracy(y, pred_l, mode="SVM")
 
         
         # validation
         pred_l_val = K_val@alpha
-        y_preds_val += [pred_l_val]
         loss_l_val = hinge_loss(yval_, pred_l_val)
         acc_l_val = accuracy(y_val,pred_l_val, mode="SVM")
         
@@ -216,15 +173,9 @@ def SVM(K, y, K_val, y_val, lambd):
         print(f"Training: loss = {loss_l:.6f}, accuracy = {acc_l:.6f}")
         print(f"Validation: loss = {loss_l_val:.6f}, accuracy = {acc_l_val:.6f}")
         
-        losses += [loss_l]
-        accuracies += [acc_l]
-        
-        losses_val += [loss_l_val]
-        accuracies_val += [acc_l_val]
-    
         alphas +=[alpha] 
         
-    return(alphas, losses, accuracies, losses_val, accuracies_val)
+    return(alphas)
 
 def solveWKRR(K, W_t, z_t, y_, l):
     n = K.shape[0]
